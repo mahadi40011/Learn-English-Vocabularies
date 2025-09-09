@@ -9,6 +9,13 @@ const manageDataLoading = (status) => {
   }
 };
 
+// word voice pronunciation
+function pronounceWord(word) {
+  const utterance = new SpeechSynthesisUtterance(word);
+  utterance.lang = "en-EN"; // English
+  window.speechSynthesis.speak(utterance);
+}
+
 //level button gulo load hocche
 const loadLesson = () => {
   fetch("https://openapi.programming-hero.com/api/levels/all")
@@ -122,7 +129,7 @@ const displayLevelWords = (words) => {
         <button onclick="loadWordDetail(${
           word.id
         })" type="button" class="btn lg:w-14 w-9 lg:h-14 h-9 bg-sky-100 text-base lg:text-2xl hover:bg-blue-300 rounded-lg"><i class="fa-solid fa-circle-info"></i></button>
-        <button type="button" class="btn lg:w-14 w-9 lg:h-14 h-9 bg-sky-100 text-base lg:text-2xl hover:bg-blue-300 rounded-lg"> <i class="fa-solid fa-volume-high"></i> </button>
+        <button onclick="pronounceWord('${word.word}')" type="button" class="btn lg:w-14 w-9 lg:h-14 h-9 bg-sky-100 text-base lg:text-2xl hover:bg-blue-300 rounded-lg"> <i class="fa-solid fa-volume-high"></i> </button>
         </div>
     </div>
     `;
@@ -154,6 +161,7 @@ const displayLesson = (lessons) => {
 // lessons load function calling
 loadLesson();
 
+//search button click event handler
 document.getElementById("search-btn").addEventListener("click", () => {
   removeActiveClass();
   const searchValue = document
