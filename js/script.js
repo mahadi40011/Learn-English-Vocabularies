@@ -46,7 +46,10 @@ const loadWordDetail = async (id) => {
 
 //modal box er bottom e word er synonym add hobe
 const createModalSynonymSection = (arr) => {
-  const synonymDivHtml = arr.map((el) => `<span class="btn">${el}</span>`);
+  const synonymDivHtml = arr.map(
+    (el) =>
+      `<div class="w-fit bg-sky-100 lg:px-3 px-2 lg:py-2 py-1 lg:rounded-md rounded-sm lg:text-xl text-xs font-medium text-gray-500" >${el}</div>`
+  );
   return synonymDivHtml.join(" ");
 };
 
@@ -55,23 +58,27 @@ const displayWordDetails = (word) => {
   const detailsBox = document.getElementById("details-container");
   detailsBox.innerHTML = `
     <div>
-        <h2 class="font-semibold text-4xl">${
+        <h2 class="font-semibold text-xl lg:text-4xl">${
           word.word
         } (<i class="fa-solid fa-microphone-lines"></i>:${
     word.pronunciation
   })</h2>
     </div>
     <div>
-        <h2 class="font-semibold text-2xl">Meaning</h2>
-        <p class="font-medium text-2xl">${word.meaning}</p>
+        <h2 class="font-semibold text-sm lg:text-2xl">Meaning</h2>
+        <p class="font-medium text-sm lg:text-2xl">${
+          word.meaning ? word.meaning : "অর্থ পাওয়া যায়নি"
+        }</p>
     </div>
     <div>
-        <h2 class="font-semibold text-2xl">Example</h2>
-        <p class="text-2xl">${word.sentence}</p>
+        <h2 class="font-semibold text-sm lg:text-2xl">Example</h2>
+        <p class="text-sm lg:text-2xl">${word.sentence}</p>
     </div>
     <div>
-        <h2 class="font-medium text-2xl">Synonyms</h2>
-        <div>${createModalSynonymSection(word.synonyms)}</div>
+        <h2 class="font-semibold text-sm lg:text-2xl">Synonyms</h2>
+        <div id="synonyms-array" class="flex flex-wrap gap-2 lg:gap-4">${createModalSynonymSection(
+          word.synonyms
+        )}</div>
     </div>
   `;
   document.getElementById("word_modal").showModal();
@@ -105,7 +112,7 @@ const displayLevelWords = (words) => {
         <h2 class="font-bold text-xl lg:text-3xl">${
           word.word ? word.word : "word পাওয়া যায়নি"
         }</h2>
-        <p class="font-medium text-sm lg:text-xl">meaning / pronunciation</p>
+        <p class="font-medium text-sm lg:text-xl">Meaning / Pronunciation</p>
         <div class="font-bangla font-semibold text-xl lg:text-3xl">"${
           word.meaning ? word.meaning : "অর্থ পাওয়া যায়নি"
         } / ${
@@ -146,3 +153,31 @@ const displayLesson = (lessons) => {
 
 // lessons load function calling
 loadLesson();
+
+document.getElementById("search-btn").addEventListener("click", () => {
+  removeActiveClass();
+  const searchValue = document
+    .getElementById("input-value")
+    .value.trim()
+    .toLowerCase();
+
+  fetch("https://openapi.programming-hero.com/api/words/all")
+    .then((res) => res.json())
+    .then((data) => {
+      const allWord = data.data;
+      const filterWords = allWord.filter((word) =>
+        word.word.toLowerCase().includes(searchValue)
+      );
+      if (filterWords.length !== 0) {
+        displayLevelWords(filterWords);
+      } else {
+        const wordsContainer = document.getElementById("words-container");
+        wordsContainer.innerHTML = `
+        <div class="col-span-full text-center lg:py-10 py-6 lg:space-y-3 space-y-2">
+            <img class="mx-auto" src="./assets/alert-error.png" alt="">
+            <p class="font-bangla font-medium lg:text-4xl text-2xl">No Word Found</p>
+        </div>
+        `;
+      }
+    });
+});
